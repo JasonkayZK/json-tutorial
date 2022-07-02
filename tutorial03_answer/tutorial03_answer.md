@@ -3,7 +3,9 @@
 * Milo Yip
 * 2016/9/27
 
-本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)的第三个单元解答编。解答代码位于 [json-tutorial/tutorial03_answer](https://github.com/miloyip/json-tutorial/blob/master/tutorial03_answer)。
+本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)
+的第三个单元解答编。解答代码位于 [json-tutorial/tutorial03_answer](https://github.com/miloyip/json-tutorial/blob/master/tutorial03_answer)
+。
 
 ## 1. 访问的单元测试
 
@@ -101,11 +103,13 @@ C:\GitHub\json-tutorial\tutorial03_answer\leptjson.c(212) : {79} normal block at
 Object dump complete.
 ~~~
 
-这正是我们在单元测试中，先设置字符串，然后设布尔值时没释放字符串所分配的内存。比较麻烦的是，它没有显示调用堆栈。从输出信息中 `... {79} ...` 我们知道是第 79 次分配的内存做成问题，我们可以加上 `_CrtSetBreakAlloc(79);` 来调试，那么它便会在第 79 次时中断于分配调用的位置，那时候就能从调用堆栈去找出来龙去脉。
+这正是我们在单元测试中，先设置字符串，然后设布尔值时没释放字符串所分配的内存。比较麻烦的是，它没有显示调用堆栈。从输出信息中 `... {79} ...` 我们知道是第 79
+次分配的内存做成问题，我们可以加上 `_CrtSetBreakAlloc(79);` 来调试，那么它便会在第 79 次时中断于分配调用的位置，那时候就能从调用堆栈去找出来龙去脉。
 
 ## 1B. Linux/OSX 下的内存泄漏检测方法
 
-在 Linux、OS X 下，我们可以使用 [valgrind](https://valgrind.org/) 工具（用 `apt-get install valgrind`、 `brew install valgrind`）。我们完全不用修改代码，只要在命令行执行：
+在 Linux、OS X 下，我们可以使用 [valgrind](https://valgrind.org/) 工具（用 `apt-get install valgrind`、 `brew install valgrind`
+）。我们完全不用修改代码，只要在命令行执行：
 
 ~~~
 $ valgrind --leak-check=full  ./leptjson_test
@@ -133,7 +137,8 @@ $ valgrind --leak-check=full  ./leptjson_test
 
 它发现了在 `test_access_boolean()` 中，由 `lept_set_string()` 分配的 2 个字节（`"a"`）泄漏了。
 
-Valgrind 还有很多功能，例如可以发现未初始化变量。我们若在应用程序或测试程序中，忘了调用 `lept_init(&v)`，那么 `v.type` 的值没被初始化，其值是不确定的（indeterministic），一些函数如果读取那个值就会出现问题：
+Valgrind 还有很多功能，例如可以发现未初始化变量。我们若在应用程序或测试程序中，忘了调用 `lept_init(&v)`，那么 `v.type`
+的值没被初始化，其值是不确定的（indeterministic），一些函数如果读取那个值就会出现问题：
 
 ~~~c
 static void test_access_boolean() {
@@ -215,18 +220,23 @@ unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
         /* ... */
 ~~~
 
-注意到 `char` 带不带符号，是实现定义的。如果编译器定义 `char` 为带符号的话，`(unsigned char)ch >= 0x80` 的字符，都会变成负数，并产生 `LEPT_PARSE_INVALID_STRING_CHAR` 错误。我们现时还没有测试 ASCII 以外的字符，所以有没有转型至不带符号都不影响，但下一单元开始处理 Unicode 的时候就要考虑了。
+注意到 `char` 带不带符号，是实现定义的。如果编译器定义 `char` 为带符号的话，`(unsigned char)ch >= 0x80`
+的字符，都会变成负数，并产生 `LEPT_PARSE_INVALID_STRING_CHAR` 错误。我们现时还没有测试 ASCII 以外的字符，所以有没有转型至不带符号都不影响，但下一单元开始处理 Unicode 的时候就要考虑了。
 
 ## 4. 性能优化的思考
 
 这是本教程第一次的开放式问题，没有标准答案。以下列出一些我想到的。
 
-1. 如果整个字符串都没有转义符，我们不就是把字符复制了两次？第一次是从 `json` 到 `stack`，第二次是从 `stack` 到 `v->u.s.s`。我们可以在 `json` 扫描 `'\0'`、`'\"'` 和 `'\\'` 3 个字符（ `ch < 0x20` 还是要检查），直至它们其中一个出现，才开始用现在的解析方法。这样做的话，前半没转义的部分可以只复制一次。缺点是，代码变得复杂一些，我们也不能使用 `lept_set_string()`。
-2. 对于扫描没转义部分，我们可考虑用 SIMD 加速，如 [RapidJSON 代码剖析（二）：使用 SSE4.2 优化字符串扫描](https://zhuanlan.zhihu.com/p/20037058) 的做法。这类底层优化的缺点是不跨平台，需要设置编译选项等。
-3. 在 gcc/clang 上使用 `__builtin_expect()` 指令来处理低概率事件，例如需要对每个字符做 `LEPT_PARSE_INVALID_STRING_CHAR` 检测，我们可以假设出现不合法字符是低概率事件，然后用这个指令告之编译器，那么编译器可能可生成较快的代码。然而，这类做法明显是不跨编译器，甚至是某个版本后的 gcc 才支持。
+1. 如果整个字符串都没有转义符，我们不就是把字符复制了两次？第一次是从 `json` 到 `stack`，第二次是从 `stack` 到 `v->u.s.s`。我们可以在 `json` 扫描 `'\0'`、`'\"'` 和 `'\\'`
+   3 个字符（ `ch < 0x20` 还是要检查），直至它们其中一个出现，才开始用现在的解析方法。这样做的话，前半没转义的部分可以只复制一次。缺点是，代码变得复杂一些，我们也不能使用 `lept_set_string()`。
+2. 对于扫描没转义部分，我们可考虑用 SIMD 加速，如 [RapidJSON 代码剖析（二）：使用 SSE4.2 优化字符串扫描](https://zhuanlan.zhihu.com/p/20037058)
+   的做法。这类底层优化的缺点是不跨平台，需要设置编译选项等。
+3. 在 gcc/clang 上使用 `__builtin_expect()` 指令来处理低概率事件，例如需要对每个字符做 `LEPT_PARSE_INVALID_STRING_CHAR`
+   检测，我们可以假设出现不合法字符是低概率事件，然后用这个指令告之编译器，那么编译器可能可生成较快的代码。然而，这类做法明显是不跨编译器，甚至是某个版本后的 gcc 才支持。
 
 ## 5. 总结
 
-本解答篇除了给出一些建议方案，也介绍了内存泄漏的检测方法。JSON 字符串本身的语法并不复杂，但它需要相关的内存分配与数据结构的设计，还好这些设计都能用于之后的数组和对象类型。下一单元专门针对 Unicode，这部分也是许多 JSON 库没有妥善处理的地方。
+本解答篇除了给出一些建议方案，也介绍了内存泄漏的检测方法。JSON 字符串本身的语法并不复杂，但它需要相关的内存分配与数据结构的设计，还好这些设计都能用于之后的数组和对象类型。下一单元专门针对 Unicode，这部分也是许多 JSON
+库没有妥善处理的地方。
 
 如果你遇到问题，有不理解的地方，或是有建议，都欢迎在评论或 [issue](https://github.com/miloyip/json-tutorial/issues) 中提出，让所有人一起讨论。

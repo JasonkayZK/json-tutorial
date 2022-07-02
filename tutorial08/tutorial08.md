@@ -3,7 +3,8 @@
 * Milo Yip
 * 2018/6/2
 
-本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)的第八个单元。代码位于 [json-tutorial/tutorial08](https://github.com/miloyip/json-tutorial/blob/master/tutorial08)。
+本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)
+的第八个单元。代码位于 [json-tutorial/tutorial08](https://github.com/miloyip/json-tutorial/blob/master/tutorial08)。
 
 本单元内容：
 
@@ -92,7 +93,9 @@ if ((v = lept_find_object_value(&o, "name", 4)) != NULL)
 
 ## 2. 相等比较
 
-在实现数组和对象的修改之前，为了测试结果的正确性，我们先实现 `lept_value` 的[相等比较](https://zh.wikipedia.org/zh-cn/%E9%97%9C%E4%BF%82%E9%81%8B%E7%AE%97%E5%AD%90)（equality comparison）。首先，两个值的类型必须相同，对于 true、false、null 这三种类型，比较类型后便完成比较。而对于数字和字符串，需进一步检查是否相等：
+在实现数组和对象的修改之前，为了测试结果的正确性，我们先实现 `lept_value`
+的[相等比较](https://zh.wikipedia.org/zh-cn/%E9%97%9C%E4%BF%82%E9%81%8B%E7%AE%97%E5%AD%90)（equality
+comparison）。首先，两个值的类型必须相同，对于 true、false、null 这三种类型，比较类型后便完成比较。而对于数字和字符串，需进一步检查是否相等：
 
 ~~~c
 int lept_is_equal(const lept_value* lhs, const lept_value* rhs) {
@@ -132,7 +135,8 @@ int lept_is_equal(const lept_value* lhs, const lept_value* rhs) {
 }
 ~~~
 
-而对象与数组的不同之处，在于概念上对象的键值对是无序的。例如，`{"a":1,"b":2}` 和 `{"b":2,"a":1}` 虽然键值的次序不同，但这两个 JSON 对象是相等的。我们可以简单地利用 `lept_find_object_index()` 去找出对应的值，然后递归作比较。这部分留给读者作为练习。
+而对象与数组的不同之处，在于概念上对象的键值对是无序的。例如，`{"a":1,"b":2}` 和 `{"b":2,"a":1}` 虽然键值的次序不同，但这两个 JSON
+对象是相等的。我们可以简单地利用 `lept_find_object_index()` 去找出对应的值，然后递归作比较。这部分留给读者作为练习。
 
 ## 3. 复制、移动与交换
 
@@ -155,7 +159,8 @@ void f() {
 
 凡涉及赋值，都可能会引起资源拥有权（resource ownership）的问题。值 `s` 并不能以指针方式简单地写入对象 `v`，因为这样便会有两个地方都拥有 `s`，会做成重复释放的 bug。我们有两个选择：
 
-1. 在 `lept_set_object_value()` 中，把参数 `value` [深度复制](https://en.wikipedia.org/wiki/Object_copying#Deep_copy)（deep copy）一个值，即把整个树复制一份，写入其新增的键值对中。
+1. 在 `lept_set_object_value()` 中，把参数 `value` [深度复制](https://en.wikipedia.org/wiki/Object_copying#Deep_copy)（deep
+   copy）一个值，即把整个树复制一份，写入其新增的键值对中。
 2. 在 `lept_set_object_value()` 中，把参数 `value` 拥有权转移至新增的键值对，再把 `value` 设置成 null 值。这就是所谓的移动语意（move semantics）。
 
 深度复制是一个常用功能，使用者也可能会用到，例如把一个 JSON 复制一个版本出来修改，保持原来的不变。所以，我们实现一个公开的深度复制函数：
@@ -182,7 +187,9 @@ void lept_copy(lept_value* dst, const lept_value* src) {
 }
 ~~~
 
-C++11 加入了右值引用的功能，可以从语言层面区分复制和移动语意。而在 C 语言中，我们也可以通过实现不同版本的接口（不同名字的函数），实现这两种语意。但为了令接口更简单和正交（orthogonal），我们修改了 `lept_set_object_value()` 的设计，让它返回新增键值对的值指针，所以我们可以用 `lept_copy()` 去复制赋值，也可以简单地改变新增的键值：
+C++11 加入了右值引用的功能，可以从语言层面区分复制和移动语意。而在 C
+语言中，我们也可以通过实现不同版本的接口（不同名字的函数），实现这两种语意。但为了令接口更简单和正交（orthogonal），我们修改了 `lept_set_object_value()`
+的设计，让它返回新增键值对的值指针，所以我们可以用 `lept_copy()` 去复制赋值，也可以简单地改变新增的键值：
 
 ~~~c
 /* 返回新增键值对的指针 */
@@ -258,7 +265,8 @@ free(out);
 lept_free(&v);
 ~~~
 
-在使用时，可尽量避免 `lept_copy()`，而改用 `lept_move()` 或 `lept_swap()`，因为后者不需要分配内存。当中 `lept_swap()` 更是无须做释放的工作，令它达到 $\mathrm{O}(1)$ 时间复杂度，其性能与值的内容无关。
+在使用时，可尽量避免 `lept_copy()`，而改用 `lept_move()` 或 `lept_swap()`，因为后者不需要分配内存。当中 `lept_swap()` 更是无须做释放的工作，令它达到 $\mathrm{O}(1)$
+时间复杂度，其性能与值的内容无关。
 
 ## 4. 动态数组
 
@@ -275,7 +283,8 @@ struct lept_value {
 };
 ~~~
 
-用这种数据结构增删元素时，我们需要重新分配一个数组，把适当的旧数据拷贝过去。但这种做法是非常低效的。例如我们想要从一个空的数组加入 $n$ 个元素，便要做 $n(n - 1)/2$ 次元素复制，即 $\mathrm{O}(n^2)$ 的时间复杂度。
+用这种数据结构增删元素时，我们需要重新分配一个数组，把适当的旧数据拷贝过去。但这种做法是非常低效的。例如我们想要从一个空的数组加入 $n$ 个元素，便要做 $n(n - 1)/2$ 次元素复制，即 $\mathrm{O}(n^2)$
+的时间复杂度。
 
 其中一个改进方法，是使用动态数组（dynamic array，或称可增长数组／growable array）的数据结构。C++ STL 标准库中最常用的 `std::vector` 也是使用这种数据结构的容器。
 
@@ -352,7 +361,8 @@ void lept_popback_array_element(lept_value* v) {
 }
 ~~~
 
-`lept_pushback_array_element()` 在数组末端压入一个元素，返回新的元素指针。如果现有的容量不足，就需要调用 `lept_reserve_array()` 扩容。我们现在用了一个最简单的扩容公式：若容量为 0，则分配 1 个元素；其他情况倍增容量。
+`lept_pushback_array_element()` 在数组末端压入一个元素，返回新的元素指针。如果现有的容量不足，就需要调用 `lept_reserve_array()` 扩容。我们现在用了一个最简单的扩容公式：若容量为
+0，则分配 1 个元素；其他情况倍增容量。
 
 `lept_popback_array_element()` 则做相反的工作，记得删去的元素需要调用 `lept_free()`。
 
@@ -386,14 +396,19 @@ void lept_remove_object_value(lept_value* v, size_t index);
 
 ## 6. 总结与练习
 
-本单元主要加入了数组和对象的访问、修改方法。当中的赋值又引申了三种赋值的方式（复制、移动、交换）。这些问题是各种编程语言中都需要考虑的事情，为了减少深度复制的成本，有些程序库或运行时还会采用[写入时复制](https://zh.wikipedia.org/zh-cn/%E5%AF%AB%E5%85%A5%E6%99%82%E8%A4%87%E8%A3%BD)（copy-on-write, COW）。而浅复制（shallow copy）则需要 [引用计数](https://zh.wikipedia.org/wiki/%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0)（reference count）或 [垃圾回收](https://zh.wikipedia.org/zh-cn/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6_(%E8%A8%88%E7%AE%97%E6%A9%9F%E7%A7%91%E5%AD%B8))（garbage collection, GC）等技术。
+本单元主要加入了数组和对象的访问、修改方法。当中的赋值又引申了三种赋值的方式（复制、移动、交换）。这些问题是各种编程语言中都需要考虑的事情，为了减少深度复制的成本，有些程序库或运行时还会采用[写入时复制](https://zh.wikipedia.org/zh-cn/%E5%AF%AB%E5%85%A5%E6%99%82%E8%A4%87%E8%A3%BD)
+（copy-on-write, COW）。而浅复制（shallow copy）则需要 [引用计数](https://zh.wikipedia.org/wiki/%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0)
+（reference
+count）或 [垃圾回收](https://zh.wikipedia.org/zh-cn/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6_(%E8%A8%88%E7%AE%97%E6%A9%9F%E7%A7%91%E5%AD%B8))
+（garbage collection, GC）等技术。
 
 另外，我们实现了以动态数组的数据结构，能较高效地对数组和对象进行增删操作。至此，我们已经完成本教程的所有核心功能。做完下面的练习后，我们还会作简单讲解，然后将迎来本教程的最后一个单元。
 
 本单元练习内容：
 
 1. 完成 `lept_is_equal()` 里的对象比较部分。不需要考虑对象内有重复键的情况。
-2. 打开 `test_access_array()` 里的 `#if 0`，实现 `lept_insert_array_element()`、`lept_erase_array_element()` 和 `lept_clear_array()`。
+2. 打开 `test_access_array()` 里的 `#if 0`，实现 `lept_insert_array_element()`、`lept_erase_array_element()`
+   和 `lept_clear_array()`。
 3. 打开 `test_access_object()` 里的 `#if 0`，参考动态数组，实现第 5 部分列出的所有函数。
 4. 完成 `lept_copy()` 里的数组和对象的复制部分。
 

@@ -3,11 +3,14 @@
 * Milo Yip
 * 2016/11/15
 
-本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)的第六个单元解答篇。解答代码位于 [json-tutorial/tutorial06_answer](https://github.com/miloyip/json-tutorial/blob/master/tutorial06_answer)。
+本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)
+的第六个单元解答篇。解答代码位于 [json-tutorial/tutorial06_answer](https://github.com/miloyip/json-tutorial/blob/master/tutorial06_answer)
+。
 
 ## 1. 重构 `lept_parse_string()`
 
-这个「提取方法」重构练习很简单，只需要把原来调用 `lept_set_string` 的地方，改为写入参数变量。因此，原来的 `lept_parse_string()` 和 答案中的 `lept_parse_string_raw()` 的 diff 仅是两处：
+这个「提取方法」重构练习很简单，只需要把原来调用 `lept_set_string` 的地方，改为写入参数变量。因此，原来的 `lept_parse_string()` 和 答案中的 `lept_parse_string_raw()` 的
+diff 仅是两处：
 
 ~~~
 130,131c130,131
@@ -30,7 +33,8 @@
 
 有了 `lept_parse_array()` 的经验，实现 `lept_parse_object()` 几乎是一样的，分别只是每个迭代要多处理一个键和冒号。我们把这个实现过程分为 5 步曲。
 
-第 1 步是利用刚才重构出来的 `lept_parse_string_raw()` 去解析键的字符串。由于 `lept_parse_string_raw()` 假设第一个字符为 `"`，我们要先作校检，失败则要返回 `LEPT_PARSE_MISS_KEY` 错误。若字符串解析成功，它会把结果存储在我们的栈之中，需要把结果写入临时 `lept_member` 的 `k` 和 `klen` 字段中：
+第 1 步是利用刚才重构出来的 `lept_parse_string_raw()` 去解析键的字符串。由于 `lept_parse_string_raw()` 假设第一个字符为 `"`
+，我们要先作校检，失败则要返回 `LEPT_PARSE_MISS_KEY` 错误。若字符串解析成功，它会把结果存储在我们的栈之中，需要把结果写入临时 `lept_member` 的 `k` 和 `klen` 字段中：
 
 ~~~c
 static int lept_parse_object(lept_context* c, lept_value* v) {
@@ -84,7 +88,8 @@ static int lept_parse_object(lept_context* c, lept_value* v) {
         m.k = NULL; /* ownership is transferred to member on stack */
 ~~~
 
-但有一点要注意，如果之前缺乏冒号，或是这里解析值失败，在函数返回前我们要释放 `m.k`。如果我们成功地解析整个成员，那么就要把 `m.k` 设为空指针，其意义是说明该键的字符串的拥有权已转移至栈，之后如遇到错误，我们不会重覆释放栈里成员的键和这个临时成员的键。
+但有一点要注意，如果之前缺乏冒号，或是这里解析值失败，在函数返回前我们要释放 `m.k`。如果我们成功地解析整个成员，那么就要把 `m.k`
+设为空指针，其意义是说明该键的字符串的拥有权已转移至栈，之后如遇到错误，我们不会重覆释放栈里成员的键和这个临时成员的键。
 
 第 4 步，解析逗号或右花括号。遇上右花括号的话，当前的 JSON 对象就解析完结了，我们把栈上的成员复制至结果，并直接返回：
 
@@ -158,6 +163,7 @@ void lept_free(lept_value* v) {
 
 至此，你已实现一个完整的 JSON 解析器，可解析任何合法的 JSON。统计一下，不计算空行及注释，现时 `leptjson.c` 只有 405 行代码，`lept_json.h` 54 行，`test.c` 309 行。
 
-另一方面，一些程序也需要生成 JSON。也许最初读者会以为生成 JSON 只需直接 `sprintf()/fprintf()` 就可以，但深入了解 JSON 的语法之后，我们应该知道 JSON 语法还是需做一些处理，例如字符串的转义、数字的格式等。然而，实现生成器还是要比解析器容易得多。而且，假设我们有一个正确的解析器，可以简单使用 roundtrip 方式实现测试。请期待下回分解。
+另一方面，一些程序也需要生成 JSON。也许最初读者会以为生成 JSON 只需直接 `sprintf()/fprintf()` 就可以，但深入了解 JSON 的语法之后，我们应该知道 JSON
+语法还是需做一些处理，例如字符串的转义、数字的格式等。然而，实现生成器还是要比解析器容易得多。而且，假设我们有一个正确的解析器，可以简单使用 roundtrip 方式实现测试。请期待下回分解。
 
 如果你遇到问题，有不理解的地方，或是有建议，都欢迎在评论或 [issue](https://github.com/miloyip/json-tutorial/issues) 中提出，让所有人一起讨论。

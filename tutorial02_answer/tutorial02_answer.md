@@ -3,7 +3,9 @@
 * Milo Yip
 * 2016/9/20
 
-本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)的第二个单元解答篇。解答代码位于 [json-tutorial/tutorial02_answer](https://github.com/miloyip/json-tutorial/blob/master/tutorial02_answer/)。
+本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)
+的第二个单元解答篇。解答代码位于 [json-tutorial/tutorial02_answer](https://github.com/miloyip/json-tutorial/blob/master/tutorial02_answer/)
+。
 
 ## 1. 重构合并
 
@@ -64,13 +66,16 @@ int exp = 0;
 v->n = (negative ? -mantissa : mantissa) * pow(10.0, exp);
 ~~~
 
-这种做法会有精度问题。实现正确的答案是很复杂的，RapidJSON 的初期版本也是 naive 的，后来 RapidJSON 就内部实现了三种算法（使用 `kParseFullPrecision` 选项开启），最后一种算法用到了大整数（高精度计算）。有兴趣的同学也可以先尝试做一个 naive 版本，不使用 `strtod()`。之后可再参考 Google 的 [double-conversion](https://github.com/google/double-conversion) 开源项目及相关论文。
+这种做法会有精度问题。实现正确的答案是很复杂的，RapidJSON 的初期版本也是 naive 的，后来 RapidJSON 就内部实现了三种算法（使用 `kParseFullPrecision`
+选项开启），最后一种算法用到了大整数（高精度计算）。有兴趣的同学也可以先尝试做一个 naive 版本，不使用 `strtod()`。之后可再参考 Google
+的 [double-conversion](https://github.com/google/double-conversion) 开源项目及相关论文。
 
 ## 3. 校验数字
 
 这条题目是本单元的重点，考验同学是否能把语法手写为校验规则。我详细说明。
 
-首先，如同 `lept_parse_whitespace()`，我们使用一个指针 `p` 来表示当前的解析字符位置。这样做有两个好处，一是代码更简单，二是在某些编译器下性能更好（因为不能确定 `c` 会否被改变，从而每次更改 `c->json` 都要做一次间接访问）。如果校验成功，才把 `p` 赋值至 `c->json`。
+首先，如同 `lept_parse_whitespace()`，我们使用一个指针 `p` 来表示当前的解析字符位置。这样做有两个好处，一是代码更简单，二是在某些编译器下性能更好（因为不能确定 `c`
+会否被改变，从而每次更改 `c->json` 都要做一次间接访问）。如果校验成功，才把 `p` 赋值至 `c->json`。
 
 ~~~c
 static int lept_parse_number(lept_context* c, lept_value* v) {
@@ -101,7 +106,8 @@ exp = ("e" / "E") ["-" / "+"] 1*digit
     if (*p == '-') p++;
 ~~~
 
-整数部分有两种合法情况，一是单个 `0`，否则是一个 1-9 再加上任意数量的 digit。对于第一种情况，我们像负号般跳过便行。对于第二种情况，第一个字符必须为 1-9，如果否定的就是不合法的，可立即返回错误码。然后，有多少个 digit 就跳过多少个。
+整数部分有两种合法情况，一是单个 `0`，否则是一个 1-9 再加上任意数量的 digit。对于第一种情况，我们像负号般跳过便行。对于第二种情况，第一个字符必须为 1-9，如果否定的就是不合法的，可立即返回错误码。然后，有多少个 digit
+就跳过多少个。
 
 ~~~c
     if (*p == '0') p++;
@@ -161,6 +167,7 @@ static int lept_parse_number(lept_context* c, lept_value* v) {
 
 ## 5. 总结
 
-本单元的习题比上个单元较有挑战性一些，所以我花了多一些篇幅在解答篇。纯以语法来说，数字类型已经是 JSON 中最复杂的类型。如果同学能完成本单元的练习（特别是第 3 条），之后的字符串、数组和对象的语法一定难不到你。然而，接下来也会有一些新挑战，例如内存管理、数据结构、编码等，希望你能满载而归。
+本单元的习题比上个单元较有挑战性一些，所以我花了多一些篇幅在解答篇。纯以语法来说，数字类型已经是 JSON 中最复杂的类型。如果同学能完成本单元的练习（特别是第 3
+条），之后的字符串、数组和对象的语法一定难不到你。然而，接下来也会有一些新挑战，例如内存管理、数据结构、编码等，希望你能满载而归。
 
 如果你遇到问题，有不理解的地方，或是有建议，都欢迎在评论或 [issue](https://github.com/miloyip/json-tutorial/issues) 中提出，让所有人一起讨论。

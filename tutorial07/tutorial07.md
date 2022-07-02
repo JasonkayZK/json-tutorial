@@ -3,7 +3,8 @@
 * Milo Yip
 * 2016/12/20
 
-本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)的第七个单元。代码位于 [json-tutorial/tutorial07](https://github.com/miloyip/json-tutorial/blob/master/tutorial07)。
+本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)
+的第七个单元。代码位于 [json-tutorial/tutorial07](https://github.com/miloyip/json-tutorial/blob/master/tutorial07)。
 
 本单元内容：
 
@@ -62,7 +63,8 @@ int lept_stringify(const lept_value* v, char** json, size_t* length) {
 
 生成根节点的值之后，我需还需要加入一个空字符作结尾。
 
-如前所述，此 API 还提供了 `length` 可选参数，当传入非空指针时，就能获得生成 JSON 的长度。或许读者会疑问，为什么需要获得长度，我们不是可以用 `strlen()` 获得么？是的，因为 JSON 不会含有空字符（若 JSON 字符串中含空字符，必须转义为 `\u0000`），用 `strlen()` 是没有问题的。但这样做会带来不必要的性能消耗，理想地是避免调用方有额外消耗。
+如前所述，此 API 还提供了 `length` 可选参数，当传入非空指针时，就能获得生成 JSON 的长度。或许读者会疑问，为什么需要获得长度，我们不是可以用 `strlen()` 获得么？是的，因为 JSON 不会含有空字符（若
+JSON 字符串中含空字符，必须转义为 `\u0000`），用 `strlen()` 是没有问题的。但这样做会带来不必要的性能消耗，理想地是避免调用方有额外消耗。
 
 ## 3. 生成 null、false 和 true
 
@@ -90,7 +92,8 @@ static void test_stringify() {
 }
 ~~~
 
-这里我们采用一个最简单的测试方式，把一个 JSON 解析，然后再生成另一 JSON，逐字符比较两个 JSON 是否一模一样。这种测试可称为往返（roundtrip）测试。但需要注意，同一个 JSON 的内容可以有多种不同的表示方式，例如可以插入不定数量的空白字符，数字 `1.0` 和 `1` 也是等价的。所以另一种测试方式，是比较两次解析的结果（`lept_value` 的树）是否相同，此功能将会在下一单元讲解。
+这里我们采用一个最简单的测试方式，把一个 JSON 解析，然后再生成另一 JSON，逐字符比较两个 JSON 是否一模一样。这种测试可称为往返（roundtrip）测试。但需要注意，同一个 JSON
+的内容可以有多种不同的表示方式，例如可以插入不定数量的空白字符，数字 `1.0` 和 `1` 也是等价的。所以另一种测试方式，是比较两次解析的结果（`lept_value` 的树）是否相同，此功能将会在下一单元讲解。
 
 然后，我们实现 `lept_stringify_value`，加入一个 `PUTS()` 宏去输出字符串：
 
@@ -154,7 +157,8 @@ leptjson 重复利用了 `lept_context` 中的数据结构作为输出缓冲，�
 
 生成通常比解析简单（一个例外是 RapidJSON 自行实现了浮点数至字符串的算法），余下的 3 种 JSON 类型就当作练习吧：
 
-1. 由于有两个地方需要生成字符串（JSON 字符串和对象类型），所以先实现 `lept_stringify_string()`。注意，字符串的语法比较复杂，一些字符必须转义，其他少于 `0x20` 的字符需要转义为 `\u00xx` 形式。
+1. 由于有两个地方需要生成字符串（JSON 字符串和对象类型），所以先实现 `lept_stringify_string()`。注意，字符串的语法比较复杂，一些字符必须转义，其他少于 `0x20` 的字符需要转义为 `\u00xx`
+   形式。
 
 2. 直接在 `lept_stringify_value()` 的 `switch` 内实现 JSON 数组和对象类型的生成。这些实现里都会递归调用 `lept_stringify_value()`。
 

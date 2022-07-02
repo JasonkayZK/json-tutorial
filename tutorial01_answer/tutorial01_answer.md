@@ -3,7 +3,9 @@
 * Milo Yip
 * 2016/9/17
 
-本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)的第一个单元解答篇。解答代码位于 [json-tutorial/tutorial01_answer](https://github.com/miloyip/json-tutorial/blob/master/tutorial01_answer/)。
+本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)
+的第一个单元解答篇。解答代码位于 [json-tutorial/tutorial01_answer](https://github.com/miloyip/json-tutorial/blob/master/tutorial01_answer/)
+。
 
 ## 1. 修正 LEPT_PARSE_ROOT_NOT_SINGULAR
 
@@ -38,7 +40,8 @@ int lept_parse(lept_value* v, const char* json) {
 }
 ~~~
 
-有一些 JSON 解析器完整解析一个值之后就会顺利返回，这是不符合标准的。但有时候也有另一种需求，文本中含多个 JSON 或其他文本串接在一起，希望当完整解析一个值之后就停下来。因此，有一些 JSON 解析器会提供这种选项，例如 RapidJSON 的 `kParseStopWhenDoneFlag`。
+有一些 JSON 解析器完整解析一个值之后就会顺利返回，这是不符合标准的。但有时候也有另一种需求，文本中含多个 JSON 或其他文本串接在一起，希望当完整解析一个值之后就停下来。因此，有一些 JSON 解析器会提供这种选项，例如
+RapidJSON 的 `kParseStopWhenDoneFlag`。
 
 ## 2. true/false 单元测试
 
@@ -123,6 +126,7 @@ static int lept_parse_value(lept_context* c, lept_value* v) {
 
 ## 4. 总结
 
-如果你能完成这个练习，恭喜你！我想你通过亲自动手，会对教程里所说的有更深入的理解。如果你遇到问题，有不理解的地方，或是有建议，都欢迎在评论或 [issue](https://github.com/miloyip/json-tutorial/issues) 中提出，让所有人一起讨论。
+如果你能完成这个练习，恭喜你！我想你通过亲自动手，会对教程里所说的有更深入的理解。如果你遇到问题，有不理解的地方，或是有建议，都欢迎在评论或 [issue](https://github.com/miloyip/json-tutorial/issues)
+中提出，让所有人一起讨论。
 
 下一单元是和数字类型相关，敬请期待。

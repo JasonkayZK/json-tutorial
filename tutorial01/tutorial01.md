@@ -3,7 +3,8 @@
 * Milo Yip
 * 2016/9/15
 
-本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)的第一个单元。教程练习源代码位于 [json-tutorial](https://github.com/miloyip/json-tutorial)。
+本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)
+的第一个单元。教程练习源代码位于 [json-tutorial](https://github.com/miloyip/json-tutorial)。
 
 本单元内容：
 
@@ -20,7 +21,8 @@
 
 ## 1. JSON 是什么
 
-JSON（JavaScript Object Notation）是一个用于数据交换的文本格式，现时的标准为[ECMA-404](https://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf)。
+JSON（JavaScript Object
+Notation）是一个用于数据交换的文本格式，现时的标准为[ECMA-404](https://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf)。
 
 虽然 JSON 源至于 JavaScript 语言，但它只是一种数据格式，可用于任何编程语言。现时具类似功能的格式有 XML、YAML，当中以 JSON 的语法最为简单。
 
@@ -28,22 +30,43 @@ JSON（JavaScript Object Notation）是一个用于数据交换的文本格式�
 
 ~~~js
 {
-    "title": "Design Patterns",
-    "subtitle": "Elements of Reusable Object-Oriented Software",
-    "author": [
+    "title"
+:
+    "Design Patterns",
+        "subtitle"
+:
+    "Elements of Reusable Object-Oriented Software",
+        "author"
+:
+    [
         "Erich Gamma",
         "Richard Helm",
         "Ralph Johnson",
         "John Vlissides"
     ],
-    "year": 2009,
-    "weight": 1.8,
-    "hardcover": true,
-    "publisher": {
-        "Company": "Pearson Education",
-        "Country": "India"
-    },
-    "website": null
+        "year"
+:
+    2009,
+        "weight"
+:
+    1.8,
+        "hardcover"
+:
+    true,
+        "publisher"
+:
+    {
+        "Company"
+    :
+        "Pearson Education",
+            "Country"
+    :
+        "India"
+    }
+,
+    "website"
+:
+    null
 }
 ~~~
 
@@ -72,7 +95,8 @@ JSON（JavaScript Object Notation）是一个用于数据交换的文本格式�
 
 我们要做的库是跨平台、跨编译器的，同学可使用任意平台进行练习。
 
-练习源代码位于 [json-tutorial](https://github.com/miloyip/json-tutorial)，当中 tutorial01 为本单元的练习代码。建议同学登记为 GitHub 用户，把项目 fork 一个自己的版本，然后在上面进行修改。不了解版本管理的同学，也可以按右方「Clone or download」按钮，简单下载一个 zip 文件。
+练习源代码位于 [json-tutorial](https://github.com/miloyip/json-tutorial)，当中 tutorial01 为本单元的练习代码。建议同学登记为 GitHub 用户，把项目 fork
+一个自己的版本，然后在上面进行修改。不了解版本管理的同学，也可以按右方「Clone or download」按钮，简单下载一个 zip 文件。
 
 我们的 JSON 库名为 leptjson，代码文件只有 3 个：
 
@@ -224,9 +248,11 @@ true  = "true"
 
 ## 5. 单元测试
 
-许多同学在做练习题时，都是以 `printf`／`cout` 打印结果，再用肉眼对比结果是否乎合预期。但当软件项目越来越复杂，这个做法会越来越低效。一般我们会采用自动的测试方式，例如单元测试（unit testing）。单元测试也能确保其他人修改代码后，原来的功能维持正确（这称为回归测试／regression testing）。
+许多同学在做练习题时，都是以 `printf`／`cout` 打印结果，再用肉眼对比结果是否乎合预期。但当软件项目越来越复杂，这个做法会越来越低效。一般我们会采用自动的测试方式，例如单元测试（unit
+testing）。单元测试也能确保其他人修改代码后，原来的功能维持正确（这称为回归测试／regression testing）。
 
-常用的单元测试框架有 xUnit 系列，如 C++ 的 [Google Test](https://github.com/google/googletest)、C# 的 [NUnit](https://www.nunit.org/)。我们为了简单起见，会编写一个极简单的单元测试方式。
+常用的单元测试框架有 xUnit 系列，如 C++ 的 [Google Test](https://github.com/google/googletest)、C# 的 [NUnit](https://www.nunit.org/)
+。我们为了简单起见，会编写一个极简单的单元测试方式。
 
 一般来说，软件开发是以周期进行的。例如，加入一个功能，再写关于该功能的单元测试。但也有另一种软件开发方法论，称为测试驱动开发（test-driven development, TDD），它的主要循环步骤是：
 
@@ -301,7 +327,8 @@ int main() {
 
 ## 6. 宏的编写技巧
 
-有些同学可能不了解 `EXPECT_EQ_BASE` 宏的编写技巧，简单说明一下。反斜线代表该行未结束，会串接下一行。而如果宏里有多过一个语句（statement），就需要用 `do { /*...*/ } while(0)` 包裹成单个语句，否则会有如下的问题：
+有些同学可能不了解 `EXPECT_EQ_BASE` 宏的编写技巧，简单说明一下。反斜线代表该行未结束，会串接下一行。而如果宏里有多过一个语句（statement），就需要用 `do { /*...*/ } while(0)`
+包裹成单个语句，否则会有如下的问题：
 
 ~~~c
 #define M() a(); b()
@@ -373,7 +400,8 @@ int lept_parse(lept_value* v, const char* json) {
 
 若 `lept_parse()` 失败，会把 `v` 设为 `null` 类型，所以这里先把它设为 `null`，让 `lept_parse_value()` 写入解析出来的根值。
 
-leptjson 是一个手写的递归下降解析器（recursive descent parser）。由于 JSON 语法特别简单，我们不需要写分词器（tokenizer），只需检测下一个字符，便可以知道它是哪种类型的值，然后调用相关的分析函数。对于完整的 JSON 语法，跳过空白后，只需检测当前字符：
+leptjson 是一个手写的递归下降解析器（recursive descent parser）。由于 JSON
+语法特别简单，我们不需要写分词器（tokenizer），只需检测下一个字符，便可以知道它是哪种类型的值，然后调用相关的分析函数。对于完整的 JSON 语法，跳过空白后，只需检测当前字符：
 
 * n ➔ null
 * t ➔ true
@@ -423,7 +451,8 @@ static int lept_parse_value(lept_context* c, lept_value* v) {
 
 断言（assertion）是 C 语言中常用的防御式编程方式，减少编程错误。最常用的是在函数开始的地方，检测所有参数。有时候也可以在调用函数后，检查上下文是否正确。
 
-C 语言的标准库含有 [`assert()`](https://en.cppreference.com/w/c/error/assert) 这个宏（需 `#include <assert.h>`），提供断言功能。当程序以 release 配置编译时（定义了 `NDEBUG` 宏），`assert()` 不会做检测；而当在 debug 配置时（没定义 `NDEBUG` 宏），则会在运行时检测 `assert(cond)` 中的条件是否为真（非 0），断言失败会直接令程序崩溃。
+C 语言的标准库含有 [`assert()`](https://en.cppreference.com/w/c/error/assert) 这个宏（需 `#include <assert.h>`），提供断言功能。当程序以 release
+配置编译时（定义了 `NDEBUG` 宏），`assert()` 不会做检测；而当在 debug 配置时（没定义 `NDEBUG` 宏），则会在运行时检测 `assert(cond)` 中的条件是否为真（非 0），断言失败会直接令程序崩溃。
 
 例如上面的 `lept_parse_null()` 开始时，当前字符应该是 `'n'`，所以我们使用一个宏 `EXPECT(c, ch)` 进行断言，并跳到下一字符。
 
@@ -435,7 +464,8 @@ assert(x++ == 0); /* 这是错误的! */
 
 这样会导致 debug 和 release 版的行为不一样。
 
-另一个问题是，初学者可能会难于分辨何时使用断言，何时处理运行时错误（如返回错误值或在 C++ 中抛出异常）。简单的答案是，如果那个错误是由于程序员错误编码所造成的（例如传入不合法的参数），那么应用断言；如果那个错误是程序员无法避免，而是由运行时的环境所造成的，就要处理运行时错误（例如开启文件失败）。
+另一个问题是，初学者可能会难于分辨何时使用断言，何时处理运行时错误（如返回错误值或在 C++
+中抛出异常）。简单的答案是，如果那个错误是由于程序员错误编码所造成的（例如传入不合法的参数），那么应用断言；如果那个错误是程序员无法避免，而是由运行时的环境所造成的，就要处理运行时错误（例如开启文件失败）。
 
 ## 9. 总结与练习
 

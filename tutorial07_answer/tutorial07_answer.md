@@ -3,7 +3,9 @@
 * Milo Yip
 * 2017/1/5
 
-本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)的第七个单元解答篇。解答代码位于 [json-tutorial/tutorial07_answer](https://github.com/miloyip/json-tutorial/blob/master/tutorial07_answer)。
+本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)
+的第七个单元解答篇。解答代码位于 [json-tutorial/tutorial07_answer](https://github.com/miloyip/json-tutorial/blob/master/tutorial07_answer)
+。
 
 ## 1. 生成字符串
 
@@ -105,7 +107,8 @@ static void* lept_context_push(lept_context* c, size_t size) {
 
 中间最花费时间的，应该会是 (1)，需要计算而且作分支检查。即使使用 C99 的 `inline` 关键字（或使用宏）去减少函数调用的开销，这个分支也无法避免。
 
-所以，一个优化的点子是，预先分配足够的内存，每次加入字符就不用做这个检查了。但多大的内存才足够呢？我们可以看到，每个字符可生成最长的形式是 `\u00XX`，占 6 个字符，再加上前后两个双引号，也就是共 `len * 6 + 2` 个输出字符。那么，使用 `char* p = lept_context_push()` 作一次分配后，便可以用 `*p++ = c` 去输出字符了。最后，再按实际输出量调整堆栈指针。
+所以，一个优化的点子是，预先分配足够的内存，每次加入字符就不用做这个检查了。但多大的内存才足够呢？我们可以看到，每个字符可生成最长的形式是 `\u00XX`，占 6 个字符，再加上前后两个双引号，也就是共 `len * 6 + 2`
+个输出字符。那么，使用 `char* p = lept_context_push()` 作一次分配后，便可以用 `*p++ = c` 去输出字符了。最后，再按实际输出量调整堆栈指针。
 
 另一个小优化点，是自行编写十六进位输出，避免了 `printf()` 内解析格式的开销。
 
@@ -148,7 +151,10 @@ static void lept_stringify_string(lept_context* c, const char* s, size_t len) {
 
 ## 4. 总结
 
-我们用 80 行左右的代码就实现了 JSON 生成器，并尝试了做一些简单的优化。除了这种最简单的功能，有一些 JSON 库还会提供一些美化功能，即加入缩进及换行。另外，有一些应用可能需要大量输出数字，那么就可能需要优化数字的输出。这方面可考虑 C++ 开源库 [double-conversion](https://github.com/google/double-conversion)，以及参考本人另一篇文章《[RapidJSON 代码剖析（四）：优化 Grisu](https://zhuanlan.zhihu.com/p/20092285)》。
+我们用 80 行左右的代码就实现了 JSON 生成器，并尝试了做一些简单的优化。除了这种最简单的功能，有一些 JSON
+库还会提供一些美化功能，即加入缩进及换行。另外，有一些应用可能需要大量输出数字，那么就可能需要优化数字的输出。这方面可考虑 C++
+开源库 [double-conversion](https://github.com/google/double-conversion)
+，以及参考本人另一篇文章《[RapidJSON 代码剖析（四）：优化 Grisu](https://zhuanlan.zhihu.com/p/20092285)》。
 
 现时数组和对象类型只有最基本的访问、修改函数，我们会在下一篇补完。
 

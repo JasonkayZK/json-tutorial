@@ -3,7 +3,8 @@
 * Milo Yip
 * 2016/10/2
 
-本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)的第四个单元。代码位于 [json-tutorial/tutorial04](https://github.com/miloyip/json-tutorial/tree/master/tutorial04)。
+本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)
+的第四个单元。代码位于 [json-tutorial/tutorial04](https://github.com/miloyip/json-tutorial/tree/master/tutorial04)。
 
 本单元内容：
 
@@ -17,15 +18,19 @@
 
 在上一个单元，我们已经能解析「一般」的 JSON 字符串，仅仅没有处理 `\uXXXX` 这种转义序列。为了解析这种序列，我们必须了解有关 Unicode 的基本概念。
 
-读者应该知道 ASCII，它是一种字符编码，把 128 个字符映射至整数 0 ~ 127。例如，`1` → 49，`A` → 65，`B` → 66 等等。这种 7-bit 字符编码系统非常简单，在计算机中以一个字节存储一个字符。然而，它仅适合美国英语，甚至一些英语中常用的标点符号、重音符号都不能表示，无法表示各国语言，特别是中日韩语等表意文字。
+读者应该知道 ASCII，它是一种字符编码，把 128 个字符映射至整数 0 ~ 127。例如，`1` → 49，`A` → 65，`B` → 66 等等。这种 7-bit
+字符编码系统非常简单，在计算机中以一个字节存储一个字符。然而，它仅适合美国英语，甚至一些英语中常用的标点符号、重音符号都不能表示，无法表示各国语言，特别是中日韩语等表意文字。
 
 在 Unicode 出现之前，各地区制定了不同的编码系统，如中文主要用 GB 2312 和大五码、日文主要用 JIS 等。这样会造成很多不便，例如一个文本信息很难混合各种语言的文字。
 
-因此，在上世纪80年代末，Xerox、Apple 等公司开始研究，是否能制定一套多语言的统一编码系统。后来，多个机构成立了 Unicode 联盟，在 1991 年释出 Unicode 1.0，收录了 24 种语言共 7161 个字符。在四分之一个世纪后的 2016年，Unicode 已释出 9.0 版本，收录 135 种语言共 128237 个字符。
+因此，在上世纪80年代末，Xerox、Apple 等公司开始研究，是否能制定一套多语言的统一编码系统。后来，多个机构成立了 Unicode 联盟，在 1991 年释出 Unicode 1.0，收录了 24 种语言共 7161
+个字符。在四分之一个世纪后的 2016年，Unicode 已释出 9.0 版本，收录 135 种语言共 128237 个字符。
 
-这些字符被收录为统一字符集（Universal Coded Character Set, UCS），每个字符映射至一个整数码点（code point），码点的范围是 0 至 0x10FFFF，码点又通常记作 U+XXXX，当中 XXXX 为 16 进位数字。例如 `劲` → U+52B2、`峰` → U+5CF0。很明显，UCS 中的字符无法像 ASCII 般以一个字节存储。
+这些字符被收录为统一字符集（Universal Coded Character Set, UCS），每个字符映射至一个整数码点（code point），码点的范围是 0 至 0x10FFFF，码点又通常记作 U+XXXX，当中 XXXX 为
+16 进位数字。例如 `劲` → U+52B2、`峰` → U+5CF0。很明显，UCS 中的字符无法像 ASCII 般以一个字节存储。
 
-因此，Unicode 还制定了各种储存码点的方式，这些方式称为  Unicode 转换格式（Uniform Transformation Format, UTF）。现时流行的 UTF 为 UTF-8、UTF-16 和 UTF-32。每种 UTF 会把一个码点储存为一至多个编码单元（code unit）。例如 UTF-8 的编码单元是 8 位的字节、UTF-16 为 16 位、UTF-32 为 32 位。除 UTF-32 外，UTF-8 和 UTF-16 都是可变长度编码。
+因此，Unicode 还制定了各种储存码点的方式，这些方式称为 Unicode 转换格式（Uniform Transformation Format, UTF）。现时流行的 UTF 为 UTF-8、UTF-16 和 UTF-32。每种
+UTF 会把一个码点储存为一至多个编码单元（code unit）。例如 UTF-8 的编码单元是 8 位的字节、UTF-16 为 16 位、UTF-32 为 32 位。除 UTF-32 外，UTF-8 和 UTF-16 都是可变长度编码。
 
 UTF-8 成为现时互联网上最流行的格式，有几个原因：
 
@@ -48,13 +53,16 @@ C 标准库没有关于 Unicode 的处理功能（C++11 有），我们会实现
 
 同学可能会发现，4 位的 16 进制数字只能表示 0 至 0xFFFF，但之前我们说 UCS 的码点是从 0 至 0x10FFFF，那怎么能表示多出来的码点？
 
-其实，U+0000 至 U+FFFF 这组 Unicode 字符称为基本多文种平面（basic multilingual plane, BMP），还有另外 16 个平面。那么 BMP 以外的字符，JSON 会使用代理对（surrogate pair）表示 `\uXXXX\uYYYY`。在 BMP 中，保留了 2048 个代理码点。如果第一个码点是 U+D800 至 U+DBFF，我们便知道它的代码对的高代理项（high surrogate），之后应该伴随一个 U+DC00 至 U+DFFF 的低代理项（low surrogate）。然后，我们用下列公式把代理对 (H, L) 变换成真实的码点：
+其实，U+0000 至 U+FFFF 这组 Unicode 字符称为基本多文种平面（basic multilingual plane, BMP），还有另外 16 个平面。那么 BMP 以外的字符，JSON 会使用代理对（surrogate
+pair）表示 `\uXXXX\uYYYY`。在 BMP 中，保留了 2048 个代理码点。如果第一个码点是 U+D800 至 U+DBFF，我们便知道它的代码对的高代理项（high surrogate），之后应该伴随一个 U+DC00 至
+U+DFFF 的低代理项（low surrogate）。然后，我们用下列公式把代理对 (H, L) 变换成真实的码点：
 
 ~~~
 codepoint = 0x10000 + (H − 0xD800) × 0x400 + (L − 0xDC00)
 ~~~
 
-举个例子，高音谱号字符 `𝄞` → U+1D11E 不是 BMP 之内的字符。在 JSON 中可写成转义序列 `\uD834\uDD1E`，我们解析第一个 `\uD834` 得到码点 U+D834，我们发现它是 U+D800 至 U+DBFF 内的码点，所以它是高代理项。然后我们解析下一个转义序列 `\uDD1E` 得到码点 U+DD1E，它在 U+DC00 至 U+DFFF 之内，是合法的低代理项。我们计算其码点：
+举个例子，高音谱号字符 `𝄞` → U+1D11E 不是 BMP 之内的字符。在 JSON 中可写成转义序列 `\uD834\uDD1E`，我们解析第一个 `\uD834` 得到码点 U+D834，我们发现它是 U+D800 至
+U+DBFF 内的码点，所以它是高代理项。然后我们解析下一个转义序列 `\uDD1E` 得到码点 U+DD1E，它在 U+DC00 至 U+DFFF 之内，是合法的低代理项。我们计算其码点：
 
 ~~~
 H = 0xD834, L = 0xDD1E
@@ -65,7 +73,8 @@ codepoint = 0x10000 + (H − 0xD800) × 0x400 + (L − 0xDC00)
           = 0x1D11E
 ~~~
 
-这样就得出这转义序列的码点，然后我们再把它编码成 UTF-8。如果只有高代理项而欠缺低代理项，或是低代理项不在合法码点范围，我们都返回 `LEPT_PARSE_INVALID_UNICODE_SURROGATE` 错误。如果 `\u` 后不是 4 位十六进位数字，则返回 `LEPT_PARSE_INVALID_UNICODE_HEX` 错误。
+这样就得出这转义序列的码点，然后我们再把它编码成 UTF-8。如果只有高代理项而欠缺低代理项，或是低代理项不在合法码点范围，我们都返回 `LEPT_PARSE_INVALID_UNICODE_SURROGATE` 错误。如果 `\u`
+后不是 4 位十六进位数字，则返回 `LEPT_PARSE_INVALID_UNICODE_HEX` 错误。
 
 ## 3. UTF-8 编码
 
@@ -138,7 +147,8 @@ static int lept_parse_string(lept_context* c, lept_value* v) {
 }
 ~~~
 
-上面代码的过程很简单，遇到 `\u` 转义时，调用 `lept_parse_hex4()` 解析 4 位十六进数字，存储为码点 `u`。这个函数在成功时返回解析后的文本指针，失败返回 `NULL`。如果失败，就返回 `LEPT_PARSE_INVALID_UNICODE_HEX` 错误。最后，把码点编码成 UTF-8，写进缓冲区。这里没有处理代理对，留作练习。
+上面代码的过程很简单，遇到 `\u` 转义时，调用 `lept_parse_hex4()` 解析 4 位十六进数字，存储为码点 `u`。这个函数在成功时返回解析后的文本指针，失败返回 `NULL`
+。如果失败，就返回 `LEPT_PARSE_INVALID_UNICODE_HEX` 错误。最后，把码点编码成 UTF-8，写进缓冲区。这里没有处理代理对，留作练习。
 
 顺带一提，我为 `lept_parse_string()` 做了个简单的重构，把返回错误码的处理抽取为宏：
 
@@ -148,7 +158,8 @@ static int lept_parse_string(lept_context* c, lept_value* v) {
 
 ## 5. 总结与练习
 
-本单元介绍了 Unicode 的基本知识，同学应该了解到一些常用的 Unicode 术语，如码点、编码单元、UTF-8、代理对等。这次的练习代码只有个空壳，要由同学填充。完成后应该能通过所有单元测试，届时我们的 JSON 字符串解析就完全符合标准了。
+本单元介绍了 Unicode 的基本知识，同学应该了解到一些常用的 Unicode 术语，如码点、编码单元、UTF-8、代理对等。这次的练习代码只有个空壳，要由同学填充。完成后应该能通过所有单元测试，届时我们的 JSON
+字符串解析就完全符合标准了。
 
 1. 实现 `lept_parse_hex4()`，不合法的十六进位数返回 `LEPT_PARSE_INVALID_UNICODE_HEX`。
 2. 按第 3 节谈到的 UTF-8 编码原理，实现 `lept_encode_utf8()`。这函数假设码点在正确范围 U+0000 ~ U+10FFFF（用断言检测）。

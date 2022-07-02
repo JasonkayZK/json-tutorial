@@ -3,7 +3,8 @@
 * Milo Yip
 * 2016/10/29
 
-本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)的第六个单元。代码位于 [json-tutorial/tutorial06](https://github.com/miloyip/json-tutorial/blob/master/tutorial06)。
+本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)
+的第六个单元。代码位于 [json-tutorial/tutorial06](https://github.com/miloyip/json-tutorial/blob/master/tutorial06)。
 
 本单元内容：
 
@@ -15,7 +16,8 @@
 
 ## 1. JSON 对象
 
-此单元是本教程最后一个关于 JSON 解析器的部分。JSON 对象和 JSON 数组非常相似，区别包括 JSON 对象以花括号 `{}`（`U+007B`、`U+007D`）包裹表示，另外 JSON 对象由对象成员（member）组成，而 JSON 数组由 JSON 值组成。所谓对象成员，就是键值对，键必须为 JSON 字符串，然后值是任何 JSON 值，中间以冒号 `:`（`U+003A`）分隔。完整语法如下：
+此单元是本教程最后一个关于 JSON 解析器的部分。JSON 对象和 JSON 数组非常相似，区别包括 JSON 对象以花括号 `{}`（`U+007B`、`U+007D`）包裹表示，另外 JSON 对象由对象成员（member）组成，而
+JSON 数组由 JSON 值组成。所谓对象成员，就是键值对，键必须为 JSON 字符串，然后值是任何 JSON 值，中间以冒号 `:`（`U+003A`）分隔。完整语法如下：
 
 ~~~
 member = string ws %x3A ws value
@@ -28,8 +30,11 @@ object = %x7B ws [ member *( ws %x2C ws member ) ] ws %x7D
 
 * 动态数组（dynamic array）：可扩展容量的数组，如 C++ 的 [`std::vector`](https://en.cppreference.com/w/cpp/container/vector)。
 * 有序动态数组（sorted dynamic array）：和动态数组相同，但保证元素已排序，可用二分搜寻查询成员。
-* 平衡树（balanced tree）：平衡二叉树可有序地遍历成员，如红黑树和 C++ 的 [`std::map`](https://en.cppreference.com/w/cpp/container/map)（[`std::multi_map`](https://en.cppreference.com/w/cpp/container/multimap) 支持重复键）。
-* 哈希表（hash table）：通过哈希函数能实现平均 O(1) 查询，如 C++11 的 [`std::unordered_map`](https://en.cppreference.com/w/cpp/container/unordered_map)（[`unordered_multimap`](https://en.cppreference.com/w/cpp/container/unordered_multimap) 支持重复键）。
+* 平衡树（balanced tree）：平衡二叉树可有序地遍历成员，如红黑树和 C++ 的 [`std::map`](https://en.cppreference.com/w/cpp/container/map)
+  （[`std::multi_map`](https://en.cppreference.com/w/cpp/container/multimap) 支持重复键）。
+* 哈希表（hash table）：通过哈希函数能实现平均 O(1) 查询，如 C++11
+  的 [`std::unordered_map`](https://en.cppreference.com/w/cpp/container/unordered_map)
+  （[`unordered_multimap`](https://en.cppreference.com/w/cpp/container/unordered_multimap) 支持重复键）。
 
 设一个对象有 n 个成员，数据结构的容量是 m，n ⩽ m，那么一些常用操作的时间／空间复杂度如下：
 
@@ -86,9 +91,11 @@ lept_value* lept_get_object_value(const lept_value* v, size_t index);
 
 ## 3. 重构字符串解析
 
-在软件工程中，[代码重构](https://zh.wikipedia.org/wiki/%E4%BB%A3%E7%A0%81%E9%87%8D%E6%9E%84)（code refactoring）是指在不改变软件外在行为时，修改代码以改进结构。代码重构十分依赖于单元测试，因为我们是通过单元测试去维护代码的正确性。有了足够的单元测试，我们可以放胆去重构，尝试并评估不同的改进方式，找到合乎心意而且能通过单元测试的改动，我们才提交它。
+在软件工程中，[代码重构](https://zh.wikipedia.org/wiki/%E4%BB%A3%E7%A0%81%E9%87%8D%E6%9E%84)（code
+refactoring）是指在不改变软件外在行为时，修改代码以改进结构。代码重构十分依赖于单元测试，因为我们是通过单元测试去维护代码的正确性。有了足够的单元测试，我们可以放胆去重构，尝试并评估不同的改进方式，找到合乎心意而且能通过单元测试的改动，我们才提交它。
 
-我们知道，成员的键也是一个 JSON 字符串，然而，我们不使用 `lept_value` 存储键，因为这样会浪费了当中 `type` 这个无用的字段。由于 `lept_parse_string()` 是直接地把解析的结果写进一个 `lept_value`，所以我们先用「提取方法（extract method，见下注）」的重构方式，把解析 JSON 字符串及写入 `lept_value` 分拆成两部分：
+我们知道，成员的键也是一个 JSON 字符串，然而，我们不使用 `lept_value` 存储键，因为这样会浪费了当中 `type` 这个无用的字段。由于 `lept_parse_string()`
+是直接地把解析的结果写进一个 `lept_value`，所以我们先用「提取方法（extract method，见下注）」的重构方式，把解析 JSON 字符串及写入 `lept_value` 分拆成两部分：
 
 ~~~c
 /* 解析 JSON 字符串，把结果写入 str 和 len */
@@ -107,11 +114,13 @@ static int lept_parse_string(lept_context* c, lept_value* v) {
 }
 ~~~
 
-这样的话，我们实现对象的解析时，就可以使用 `lept_parse_string_raw()`　来解析 JSON 字符串，然后把结果复制至 `lept_member` 的 `k` 和 `klen` 字段。
+这样的话，我们实现对象的解析时，就可以使用 `lept_parse_string_raw()` 来解析 JSON 字符串，然后把结果复制至 `lept_member` 的 `k` 和 `klen` 字段。
 
-注：在 Fowler 的经典著作 [1] 中，把各种重构方式分门别类，每个方式都有详细的步骤说明。由于书中以 Java 为例子，所以方式的名称使用了 Java 的述语，例如方法（method）。在 C 语言中，「提取方法」其实应该称为「提取函数」。
+注：在 Fowler 的经典著作 [1] 中，把各种重构方式分门别类，每个方式都有详细的步骤说明。由于书中以 Java 为例子，所以方式的名称使用了 Java 的述语，例如方法（method）。在 C
+语言中，「提取方法」其实应该称为「提取函数」。
 
-[1] Fowler, Martin. Refactoring: improving the design of existing code. Pearson Education India, 2009. 中译本：熊节译，《重构——改善既有代码的设计》，人民邮电出版社，2010年。
+[1] Fowler, Martin. Refactoring: improving the design of existing code. Pearson Education India, 2009.
+中译本：熊节译，《重构——改善既有代码的设计》，人民邮电出版社，2010年。
 
 ## 4. 实现
 

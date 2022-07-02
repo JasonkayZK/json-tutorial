@@ -3,7 +3,9 @@
 * Milo Yip
 * 2016/10/6
 
-本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)的第四个单元解答篇。解答代码位于 [json-tutorial/tutorial04_answer](https://github.com/miloyip/json-tutorial/blob/master/tutorial04_answer)。
+本文是[《从零开始的 JSON 库教程》](https://zhuanlan.zhihu.com/json-tutorial)
+的第四个单元解答篇。解答代码位于 [json-tutorial/tutorial04_answer](https://github.com/miloyip/json-tutorial/blob/master/tutorial04_answer)
+。
 
 ## 1. 实现 `lept_parse_hex4()`
 
@@ -35,7 +37,8 @@ static const char* lept_parse_hex4(const char* p, unsigned* u) {
 }
 ~~~
 
-但这个实现会错误地接受 `"\u 123"` 这种不合法的 JSON，因为 `strtol()` 会跳过开始的空白。要解决的话，还需要检测第一个字符是否 `[0-9A-Fa-f]`，或者 `!isspace(*p)`。但为了 `strtol()` 做多余的检测，而且自行实现也很简单，我个人会选择首个方案。（前两个单元用 `strtod()` 就没办法，因为它的实现要复杂得多。）
+但这个实现会错误地接受 `"\u 123"` 这种不合法的 JSON，因为 `strtol()` 会跳过开始的空白。要解决的话，还需要检测第一个字符是否 `[0-9A-Fa-f]`，或者 `!isspace(*p)`
+。但为了 `strtol()` 做多余的检测，而且自行实现也很简单，我个人会选择首个方案。（前两个单元用 `strtod()` 就没办法，因为它的实现要复杂得多。）
 
 ## 2. 实现 `lept_encode_utf8()`
 
@@ -64,7 +67,9 @@ static void lept_encode_utf8(lept_context* c, unsigned u) {
 }
 ~~~
 
-有同学可能觉得奇怪，最终也是写进一个 `char`，为什么要做 `x & 0xFF` 这种操作呢？这是因为 `u` 是 `unsigned` 类型，一些编译器可能会警告这个转型可能会截断数据。但实际上，配合了范围的检测然后右移之后，可以保证写入的是 0~255 内的值。为了避免一些编译器的警告误判，我们加上 `x & 0xFF`。一般来说，编译器在优化之后，这与操作是会被消去的，不会影响性能。
+有同学可能觉得奇怪，最终也是写进一个 `char`，为什么要做 `x & 0xFF` 这种操作呢？这是因为 `u` 是 `unsigned`
+类型，一些编译器可能会警告这个转型可能会截断数据。但实际上，配合了范围的检测然后右移之后，可以保证写入的是 0~255 内的值。为了避免一些编译器的警告误判，我们加上 `x & 0xFF`
+。一般来说，编译器在优化之后，这与操作是会被消去的，不会影响性能。
 
 其实超过 1 个字符输出时，可以只调用 1 次 `lept_context_push()`。这里全用 `PUTC()` 只是为了代码看上去简单一点。
 
@@ -93,7 +98,8 @@ case 'u':
 
 ## 4. 总结
 
-JSON 的字符串解析终于完成了。但更重要的是，同学通过教程和练习后，应该对于 Unicode 和 UTF-8 编码有基本了解。使用 Unicode 标准去处理文本数据已是世界潮流。虽然 C11/C++11 引入了 Unicode 字符串字面量及少量函数，但仍然有很多不足，一般需要借助第三方库。
+JSON 的字符串解析终于完成了。但更重要的是，同学通过教程和练习后，应该对于 Unicode 和 UTF-8 编码有基本了解。使用 Unicode 标准去处理文本数据已是世界潮流。虽然 C11/C++11 引入了 Unicode
+字符串字面量及少量函数，但仍然有很多不足，一般需要借助第三方库。
 
 我们在稍后的单元还要处理生成时的 Unicode 问题，接下来我们要继续讨论数组和对象的解析。
 
